@@ -1,7 +1,7 @@
 ########################################################
 #### Article-output functions for common statistical tests
 #### Written by Marian Sauter, 2017
-#### Version 0.2 - 24.02.17
+#### Version 0.3 - 24.02.17
 ########################################################
 ## Produces article-ready output for a one- or two-sample t-test
 ##  obj: a t.test object (list of 9)
@@ -83,29 +83,33 @@ article.ezANOVA <- function(aov=NULL) {
   
   string <- ""
   
-  for(i in 2:nrow(aov$ANOVA)){
-    
-    effect <- paste(gsub(":", " X ", aov$ANOVA$Effect[i])," ",sep="")
-    sig <- ifelse(aov$ANOVA$`p<.05`[i] == "*", "significant", "not significant")
-    
-    if(grepl(" X ", effect)) text <- paste("The interaction ",effect, "was ",sig,": ",sep="")
-    else text <- paste("The main effect ",effect, "was ",sig,": ",sep="")
-
-    DFn <- aov$ANOVA$DFn[i]
-    DFd <- aov$ANOVA$DFd[i]
-    f <- round(aov$ANOVA$F[i],digits=2)
-    
-    p <- round(aov$ANOVA$p[i],digits=3)
-    if(p < 0.001) p <- "p < .001"
-    else p <- paste("p = ",substring(toString(p), 2),sep="")
-    
-    substring <- paste(
-      text,
-      "F(",DFn,", ",DFd,") = ",f, 
-      ", ",p, 
-      sep="")
-    
-    string <- paste(string, substring, sep="; ")
+  for(i in 1:nrow(aov$ANOVA)){
+    if(aov$ANOVA$Effect[i] != "(Intercept)"){
+      effect <- paste(gsub(":", " X ", aov$ANOVA$Effect[i])," ",sep="")
+      sig <- ifelse(aov$ANOVA$`p<.05`[i] == "*", "significant", "not significant")
+      
+      if(grepl(" X ", effect)) text <- paste("The interaction ",effect, "was ",sig,": ",sep="")
+      else text <- paste("The main effect ",effect, "was ",sig,": ",sep="")
+      
+      DFn <- aov$ANOVA$DFn[i]
+      DFd <- aov$ANOVA$DFd[i]
+      f <- round(aov$ANOVA$F[i],digits=2)
+      
+      peta <- round(aov$ANOVA$SSn[i]/(aov$ANOVA$SSn[i]+aov$ANOVA$SSd[i]), digits = 2)
+      
+      p <- round(aov$ANOVA$p[i],digits=3)
+      if(p < 0.001) p <- "p < .001"
+      else p <- paste("p = ",substring(toString(p), 2),sep="")
+      
+      substring <- paste(
+        text,
+        "F(",DFn,", ",DFd,") = ",f, 
+        ", ",p, 
+        ", p-eta^2 = ",peta,
+        sep="")
+      
+      string <- paste(string, substring, sep="; ")
+    }
   }
 
   return(substring(string,3))
