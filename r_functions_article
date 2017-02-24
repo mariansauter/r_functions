@@ -1,16 +1,16 @@
 ########################################################
 #### Article-output functions for common statistical tests
 #### Written by Marian Sauter, 2017
-#### Version 0.1 - 24.02.17
+#### Version 0.2 - 24.02.17
 ########################################################
 ## Produces article-ready output for a one- or two-sample t-test
 ##  obj: a t.test object (list of 9)
 ##  unit: the measurement unit, standard is ms
 article.ttest <- function(obj=NULL, unit="ms") {
   
-  estimatex <- round(unname(obj$estimate[1]))
+  estimatex <- signif(unname(obj$estimate[1]),4)
   estimatey <- NULL
-  if(!is.na(obj$estimate[2])) estimatey <- round(unname(obj$estimate[2]))
+  if(!is.na(obj$estimate[2])) estimatey <- signif(unname(obj$estimate[2]),4)
   df <- round(unname(obj$parameter),digits=2)
   statistic <- round(unname(obj$statistic),digits=2)
   
@@ -18,8 +18,8 @@ article.ttest <- function(obj=NULL, unit="ms") {
   if(p < 0.001) p <- "p < .001"
   else p <- paste("p = ",substring(toString(p), 2),sep="")
   
-  ci1 <- round(as.numeric(obj$conf.int[1]))
-  ci2 <- round(as.numeric(obj$conf.int[2]))
+  ci1 <- signif(as.numeric(obj$conf.int[1]),4)
+  ci2 <- signif(as.numeric(obj$conf.int[2]),4)
   
   if(is.null(estimatey)) est_string = paste("M = ", estimatex," ",unit, sep="") 
   else est_string = paste(estimatex," ",unit," vs ",estimatey," ",unit, sep="")
@@ -46,8 +46,8 @@ article.ttest_full <- function(obj=NULL, dz=NULL, BF=NULL,unit="ms") {
 
   d <- dz
   estimatey <- NULL
-  estimatex <- round(unname(obj$estimate[1]))
-  if(!is.na(obj$estimate[2])) estimatey <- round(unname(obj$estimate[2]))
+  estimatex <- signif(unname(obj$estimate[1]),4)
+  if(!is.na(obj$estimate[2])) estimatey <- signif(unname(obj$estimate[2]),4)
   df <- round(unname(obj$parameter),digits=2)
   statistic <- round(unname(obj$statistic),digits=2)
   
@@ -56,14 +56,14 @@ article.ttest_full <- function(obj=NULL, dz=NULL, BF=NULL,unit="ms") {
   else p <- paste("p = ",substring(toString(p), 2),sep="")
   
   hpd <- HPDinterval(invisible(posterior(BF, iterations = 10000)))
-  ci1 <- round(HPDinterval(BFsamples)[1,1])
-  ci2 <- round(HPDinterval(BFsamples)[1,2])
+  ci1 <- signif(HPDinterval(BFsamples)[1,1],4)
+  ci2 <- signif(HPDinterval(BFsamples)[1,2],4)
   cip <- attr(HPDinterval(BFsamples), "Probability")
   
   if(is.null(estimatey)) est_string = paste("M = ", estimatex," ",unit, sep="") 
   else est_string = paste(estimatex," ",unit," vs ",estimatey," ",unit, sep="")
   
-  bayes <- round(extractBF(BF)$bf, digits=2)
+  bayes <- signif(extractBF(BF)$bf, 4)
   
   string <- paste(
     est_string,
